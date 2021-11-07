@@ -67,7 +67,7 @@ public class Utils {
     public static void createNotificationChannel() {
         final NotificationManager nm = App.app.getSystemService(NotificationManager.class);
         if (!sNotificationChannelCreated) {
-            nm.createNotificationChannel(new NotificationChannel("Main", "Main", NotificationManager.IMPORTANCE_DEFAULT));
+            nm.createNotificationChannel(new NotificationChannel("High", "High", NotificationManager.IMPORTANCE_HIGH));
             nm.createNotificationChannel(new NotificationChannel("Low", "Low", NotificationManager.IMPORTANCE_LOW));
             sNotificationChannelCreated = true;
         }
@@ -76,7 +76,7 @@ public class Utils {
     private static void notifyOnce(String title, String desc, Level level) {
         createNotificationChannel();
         final Notification.Builder builder = new Notification
-                .Builder(App.app, level == Level.WARNING ? "Main" : "Low")
+                .Builder(App.app, level == Level.WARNING ? "High" : "Low")
                 .setContentTitle(title)
                 .setContentText(desc)
                 .setSmallIcon(App.icon);
