@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "me.xd.watchdogezilla"
         minSdk 29
-        targetSdk 31
+        targetSdk 29
         versionCode 1
         versionName "1.0"
     }
