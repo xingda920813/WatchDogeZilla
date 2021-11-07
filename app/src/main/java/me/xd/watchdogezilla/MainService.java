@@ -1,6 +1,8 @@
 package me.xd.watchdogezilla;
 
+import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -25,6 +27,12 @@ public class MainService extends Service {
                 final double price = Utils.fetchPrice();
                 Utils.notifyOnce(price);
                 Utils.lastPrice = price;
+                if (intent.getBooleanExtra("AlarmManager", false)) {
+                    final AlarmManager am = App.sApp.getSystemService(AlarmManager.class);
+                    final long delay = 15 * 60 * 1000;
+                    final PendingIntent pi = createAlarmManagerPendingIntent();
+                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delay, pi);
+                }
             }).start();
         }
         return START_STICKY;
@@ -33,5 +41,11 @@ public class MainService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    public static PendingIntent createAlarmManagerPendingIntent() {
+        final Intent intent = new Intent(App.sApp, MainService.class);
+        intent.putExtra("AlarmManager", true);
+        return PendingIntent.getService(App.sApp, 64, intent, PendingIntent.FLAG_IMMUTABLE);
     }
 }
