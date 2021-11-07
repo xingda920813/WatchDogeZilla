@@ -85,10 +85,10 @@ public class Utils {
                     .setColor(Color.YELLOW);
         } else {
             final Intent intent = new Intent(App.sApp, MainService.class);
-            final PendingIntent pendingIntent = PendingIntent.getService(App.sApp, 1024, intent, PendingIntent.FLAG_IMMUTABLE);
+            final PendingIntent pendingIntent = PendingIntent.getService(App.sApp, 8, intent, PendingIntent.FLAG_IMMUTABLE);
             final Notification.Action.Builder actionBuilder = new Notification.Action.Builder(App.sIcon, "立即更新", pendingIntent);
             builder.addAction(actionBuilder.build());
         }
-        App.sApp.getSystemService(NotificationManager.class).notify(1024, builder.build());
+        App.sApp.getSystemService(NotificationManager.class).notify(level == Level.WARNING ? 32 : 16, builder.build());
     }
 }

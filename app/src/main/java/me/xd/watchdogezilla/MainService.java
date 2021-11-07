@@ -18,7 +18,7 @@ public class MainService extends Service {
                     .Builder(App.sApp, "Low")
                     .setContentTitle("正在启动服务...")
                     .setSmallIcon(App.sIcon);
-            startForeground(1024, builder.build());
+            startForeground(16, builder.build());
             new Thread(new Main()).start();
         } else {
             new Thread(() -> {
