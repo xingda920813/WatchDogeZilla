@@ -9,7 +9,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        App.sApp.startForegroundService(new Intent(App.sApp, MainService.class));
+        App.app.startForegroundService(new Intent(App.app, MainService.class));
         finish();
     }
 }

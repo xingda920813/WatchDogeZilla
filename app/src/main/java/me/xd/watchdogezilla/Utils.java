@@ -65,7 +65,7 @@ public class Utils {
     }
 
     public static void createNotificationChannel() {
-        final NotificationManager nm = App.sApp.getSystemService(NotificationManager.class);
+        final NotificationManager nm = App.app.getSystemService(NotificationManager.class);
         if (!sNotificationChannelCreated) {
             nm.createNotificationChannel(new NotificationChannel("Main", "Main", NotificationManager.IMPORTANCE_DEFAULT));
             nm.createNotificationChannel(new NotificationChannel("Low", "Low", NotificationManager.IMPORTANCE_LOW));
@@ -76,19 +76,19 @@ public class Utils {
     private static void notifyOnce(String title, String desc, Level level) {
         createNotificationChannel();
         final Notification.Builder builder = new Notification
-                .Builder(App.sApp, level == Level.WARNING ? "Main" : "Low")
+                .Builder(App.app, level == Level.WARNING ? "Main" : "Low")
                 .setContentTitle(title)
                 .setContentText(desc)
-                .setSmallIcon(App.sIcon);
+                .setSmallIcon(App.icon);
         if (level == Level.WARNING) {
             builder.setColorized(true)
                     .setColor(Color.YELLOW);
         } else {
-            final Intent intent = new Intent(App.sApp, MainService.class);
-            final PendingIntent pendingIntent = PendingIntent.getService(App.sApp, 8, intent, PendingIntent.FLAG_IMMUTABLE);
-            final Notification.Action.Builder actionBuilder = new Notification.Action.Builder(App.sIcon, "立即更新", pendingIntent);
+            final Intent intent = new Intent(App.app, MainService.class);
+            final PendingIntent pendingIntent = PendingIntent.getService(App.app, 8, intent, PendingIntent.FLAG_IMMUTABLE);
+            final Notification.Action.Builder actionBuilder = new Notification.Action.Builder(App.icon, "立即更新", pendingIntent);
             builder.addAction(actionBuilder.build());
         }
-        App.sApp.getSystemService(NotificationManager.class).notify(level == Level.WARNING ? 32 : 16, builder.build());
+        App.app.getSystemService(NotificationManager.class).notify(level == Level.WARNING ? 32 : 16, builder.build());
     }
 }

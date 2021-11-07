@@ -9,6 +9,6 @@ public class BootCompletedReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         System.out.println(intent.getAction());
-        App.sApp.startForegroundService(new Intent(App.sApp, MainService.class));
+        App.app.startForegroundService(new Intent(App.app, MainService.class));
     }
 }

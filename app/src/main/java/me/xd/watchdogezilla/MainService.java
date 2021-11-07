@@ -7,6 +7,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import java.util.Calendar;
+
 public class MainService extends Service {
 
     private static boolean sStarted;
@@ -14,27 +16,41 @@ public class MainService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (!sStarted) {
-            sStarted = true;
             Utils.createNotificationChannel();
             final Notification.Builder builder = new Notification
-                    .Builder(App.sApp, "Low")
+                    .Builder(App.app, "Low")
                     .setContentTitle("正在启动服务...")
-                    .setSmallIcon(App.sIcon);
+                    .setSmallIcon(App.icon);
             startForeground(16, builder.build());
-            new Thread(new Main()).start();
-        } else {
-            new Thread(() -> {
-                final double price = Utils.fetchPrice();
-                Utils.notifyOnce(price);
-                Utils.lastPrice = price;
-                if (intent.getBooleanExtra("AlarmManager", false)) {
-                    final AlarmManager am = App.sApp.getSystemService(AlarmManager.class);
-                    final long delay = 15 * 60 * 1000;
-                    final PendingIntent pi = createAlarmManagerPendingIntent();
-                    am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delay, pi);
-                }
-            }).start();
         }
+        new Thread(() -> {
+            final double price = Utils.fetchPrice();
+            Utils.notifyOnce(price);
+            Utils.lastPrice = price;
+            final long delay;
+            if (intent.getBooleanExtra("fromAlarmManager", false)) {
+                delay = 15 * 60 * 1000;
+            } else if (!sStarted) {
+                sStarted = true;
+                final int minute = Calendar.getInstance().get(Calendar.MINUTE);
+                final int nextMinute;
+                if (minute < 15) {
+                    nextMinute = 15;
+                } else if (minute < 30) {
+                    nextMinute = 30;
+                } else if (minute < 45) {
+                    nextMinute = 45;
+                } else {
+                    nextMinute = 60;
+                }
+                delay = (nextMinute - minute) * 60 * 1000;
+            } else {
+                return;
+            }
+            final AlarmManager am = App.app.getSystemService(AlarmManager.class);
+            final PendingIntent pi = createAlarmManagerPendingIntent();
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delay, pi);
+        }).start();
         return START_STICKY;
     }
 
@@ -43,9 +59,9 @@ public class MainService extends Service {
         return null;
     }
 
-    public static PendingIntent createAlarmManagerPendingIntent() {
-        final Intent intent = new Intent(App.sApp, MainService.class);
-        intent.putExtra("AlarmManager", true);
-        return PendingIntent.getService(App.sApp, 64, intent, PendingIntent.FLAG_IMMUTABLE);
+    private static PendingIntent createAlarmManagerPendingIntent() {
+        final Intent intent = new Intent(App.app, MainService.class);
+        intent.putExtra("fromAlarmManager", true);
+        return PendingIntent.getService(App.app, 64, intent, PendingIntent.FLAG_IMMUTABLE);
     }
 }
