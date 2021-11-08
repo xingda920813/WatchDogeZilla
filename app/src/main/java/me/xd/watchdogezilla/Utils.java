@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 public class Utils {
 
-    public static Double lastPrice;
+    public static double lastPrice = Double.NaN;
 
     private static boolean sNotificationChannelCreated;
 
@@ -46,7 +46,7 @@ public class Utils {
         final String title = formatPrice(price);
         Level level = Level.INFO;
         final String desc;
-        if (lastPrice != null) {
+        if (!Double.isNaN(lastPrice)) {
             final double changeInPercentage = (price - lastPrice) / lastPrice;
             if (changeInPercentage >= 0.01 || changeInPercentage <= -0.01) {
                 level = Level.WARNING;
