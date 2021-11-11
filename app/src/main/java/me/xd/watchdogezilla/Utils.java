@@ -23,7 +23,7 @@ public class Utils {
 
     public static double fetchPrice() {
         try {
-            final URL url = new URL("https://www.okex.com/api/index/v3/ETH-USDT/constituents");
+            final URL url = new URL("https://capi.bitgetapi.com/api/swap/v3/market/mark_price?symbol=cmt_ethusdt");
             try (final BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
                 final String body = reader.lines().collect(Collectors.joining("\n"));
                 final String last = extractPrice(body);
@@ -36,7 +36,7 @@ public class Utils {
     }
 
     private static String extractPrice(String res) {
-        final String key = "\"last\":\"";
+        final String key = "\"mark_price\":\"";
         final int start = res.indexOf(key) + key.length();
         final int end = res.indexOf('"', start);
         return res.substring(start, end);
