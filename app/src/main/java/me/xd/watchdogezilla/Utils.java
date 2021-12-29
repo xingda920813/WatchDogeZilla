@@ -23,15 +23,20 @@ public class Utils {
 
     public static double fetchPrice() {
         try {
-            final URL url = new URL("https://capi.bitgetapi.com/api/swap/v3/market/mark_price?symbol=cmt_ethusdt");
-            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
-                final String body = reader.lines().collect(Collectors.joining("\n"));
-                final String last = extractPrice(body);
-                return Double.parseDouble(last);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return Double.NaN;
+            return fetchPriceCore();
+        } catch (IOException ignored) {}
+        try {
+            return fetchPriceCore();
+        } catch (IOException ignored) {}
+        return Double.NaN;
+    }
+
+    private static double fetchPriceCore() throws IOException {
+        final URL url = new URL("https://capi.bitgetapi.com/api/swap/v3/market/mark_price?symbol=cmt_ethusdt");
+        try (final BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+            final String body = reader.lines().collect(Collectors.joining("\n"));
+            final String last = extractPrice(body);
+            return Double.parseDouble(last);
         }
     }
 
