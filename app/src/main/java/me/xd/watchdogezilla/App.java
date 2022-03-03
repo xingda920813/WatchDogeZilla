@@ -7,7 +7,7 @@ import me.xd.task.PeriodicTaskService;
 
 public class App extends Application {
 
-    public static App app;
+    static App app;
 
     @Override
     public void onCreate() {
@@ -16,7 +16,7 @@ public class App extends Application {
         PeriodicTaskService.init(Icon.createWithData(Images.ETH, 0, Images.ETH.length), () -> {
             final double price = Utils.fetchPrice();
             Utils.notifyOnce(price);
-            Utils.lastPrice = price;
+            Utils.sLastPrice = price;
         }, fromAlarmManager -> -1);
     }
 }
