@@ -3,6 +3,7 @@ package me.xd.watchdogezilla;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.graphics.Color;
 
 import java.io.BufferedReader;
@@ -46,7 +47,7 @@ class Utils {
         return res.substring(start, end);
     }
 
-    static void notifyOnce(double price) {
+    static void notifyOnce(Context ctx, double price) {
         final String title = formatPrice(price);
         Level level = Level.INFO;
         final String desc;
@@ -61,17 +62,17 @@ class Utils {
         } else {
             desc = "ETH/USDT 现报 " + title;
         }
-        notifyOnce(title, desc, level);
+        notifyOnce(ctx, title, desc, level);
     }
 
     private static String formatPrice(double price) {
         return String.format(Locale.US, "%.2f", price);
     }
 
-    private static void notifyOnce(String title, String desc, Level level) {
-        PeriodicTaskUtils.createNotificationChannel(App.app);
+    private static void notifyOnce(Context ctx, String title, String desc, Level level) {
+        PeriodicTaskUtils.createNotificationChannel(ctx);
         final Notification.Builder builder = new Notification
-                .Builder(App.app, level == Level.WARNING ? "High" : "Low")
+                .Builder(ctx, level == Level.WARNING ? "High" : "Low")
                 .setContentTitle(title)
                 .setContentText(desc)
                 .setSmallIcon(PeriodicTaskService.icon);
@@ -79,10 +80,10 @@ class Utils {
             builder.setColorized(true)
                     .setColor(Color.YELLOW);
         } else {
-            final PendingIntent pi = PeriodicTaskUtils.createPendingIntent(App.app);
+            final PendingIntent pi = PeriodicTaskUtils.createPendingIntent(ctx);
             final Notification.Action.Builder actionBuilder = new Notification.Action.Builder(PeriodicTaskService.icon, "立即更新", pi);
             builder.addAction(actionBuilder.build());
         }
-        App.app.getSystemService(NotificationManager.class).notify(level == Level.WARNING ? 32 : 16, builder.build());
+        ctx.getSystemService(NotificationManager.class).notify(level == Level.WARNING ? 32 : 16, builder.build());
     }
 }
