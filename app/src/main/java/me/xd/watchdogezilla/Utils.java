@@ -79,8 +79,8 @@ class Utils {
             builder.setColorized(true)
                     .setColor(Color.YELLOW);
         } else {
-            final PendingIntent pendingIntent = PeriodicTaskUtils.createPendingIntent(App.app);
-            final Notification.Action.Builder actionBuilder = new Notification.Action.Builder(PeriodicTaskService.icon, "立即更新", pendingIntent);
+            final PendingIntent pi = PeriodicTaskUtils.createPendingIntent(App.app);
+            final Notification.Action.Builder actionBuilder = new Notification.Action.Builder(PeriodicTaskService.icon, "立即更新", pi);
             builder.addAction(actionBuilder.build());
         }
         App.app.getSystemService(NotificationManager.class).notify(level == Level.WARNING ? 32 : 16, builder.build());
