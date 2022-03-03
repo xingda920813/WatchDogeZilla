@@ -1,10 +1,8 @@
 package me.xd.watchdogezilla;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Intent;
 import android.graphics.Color;
 
 import java.io.BufferedReader;
@@ -15,11 +13,12 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-public class Utils {
+import me.xd.task.PeriodicTaskService;
+import me.xd.task.PeriodicTaskUtils;
+
+class Utils {
 
     public static double lastPrice = Double.NaN;
-
-    private static boolean sNotificationChannelCreated;
 
     public static double fetchPrice() {
         try {
@@ -69,29 +68,19 @@ public class Utils {
         return String.format(Locale.US, "%.2f", price);
     }
 
-    public static void createNotificationChannel() {
-        final NotificationManager nm = App.app.getSystemService(NotificationManager.class);
-        if (!sNotificationChannelCreated) {
-            nm.createNotificationChannel(new NotificationChannel("High", "High", NotificationManager.IMPORTANCE_HIGH));
-            nm.createNotificationChannel(new NotificationChannel("Low", "Low", NotificationManager.IMPORTANCE_LOW));
-            sNotificationChannelCreated = true;
-        }
-    }
-
     private static void notifyOnce(String title, String desc, Level level) {
-        createNotificationChannel();
+        PeriodicTaskUtils.createNotificationChannel(App.app);
         final Notification.Builder builder = new Notification
                 .Builder(App.app, level == Level.WARNING ? "High" : "Low")
                 .setContentTitle(title)
                 .setContentText(desc)
-                .setSmallIcon(App.icon);
+                .setSmallIcon(PeriodicTaskService.icon);
         if (level == Level.WARNING) {
             builder.setColorized(true)
                     .setColor(Color.YELLOW);
         } else {
-            final Intent intent = new Intent(App.app, MainService.class);
-            final PendingIntent pendingIntent = PendingIntent.getService(App.app, 8, intent, PendingIntent.FLAG_IMMUTABLE);
-            final Notification.Action.Builder actionBuilder = new Notification.Action.Builder(App.icon, "立即更新", pendingIntent);
+            final PendingIntent pendingIntent = PeriodicTaskUtils.createPendingIntent(App.app);
+            final Notification.Action.Builder actionBuilder = new Notification.Action.Builder(PeriodicTaskService.icon, "立即更新", pendingIntent);
             builder.addAction(actionBuilder.build());
         }
         App.app.getSystemService(NotificationManager.class).notify(level == Level.WARNING ? 32 : 16, builder.build());
