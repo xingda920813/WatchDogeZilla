@@ -13,13 +13,22 @@ import android.provider.Settings;
 
 public class PeriodicTaskUtils {
 
+    public static final String CHANNEL_ID_HIGH = "High";
+    public static final String CHANNEL_ID_LOW = "Low";
+
+    public static final int NOTIFICATION_ID_HIGH = 64;
+    public static final int NOTIFICATION_ID_LOW = 32;
+
+    static final int REQUEST_CODE_ALARM_MANAGER = 16;
+    private static final int REQUEST_CODE_PENDING_INTENT = 8;
+
     private static boolean sNotificationChannelCreated;
 
     public static void createNotificationChannel(Context ctx) {
-        final NotificationManager nm = ctx.getSystemService(NotificationManager.class);
         if (!sNotificationChannelCreated) {
-            nm.createNotificationChannel(new NotificationChannel("High", "High", NotificationManager.IMPORTANCE_HIGH));
-            nm.createNotificationChannel(new NotificationChannel("Low", "Low", NotificationManager.IMPORTANCE_LOW));
+            final NotificationManager nm = ctx.getSystemService(NotificationManager.class);
+            nm.createNotificationChannel(new NotificationChannel(CHANNEL_ID_HIGH, CHANNEL_ID_HIGH, NotificationManager.IMPORTANCE_HIGH));
+            nm.createNotificationChannel(new NotificationChannel(CHANNEL_ID_LOW, CHANNEL_ID_LOW, NotificationManager.IMPORTANCE_LOW));
             sNotificationChannelCreated = true;
         }
     }
@@ -32,10 +41,10 @@ public class PeriodicTaskUtils {
     public static PendingIntent createPendingIntent(Context ctx) {
         ctx = ctx.getApplicationContext();
         final Intent intent = new Intent(ctx, PeriodicTaskService.class);
-        return PendingIntent.getService(ctx, 8, intent, PendingIntent.FLAG_IMMUTABLE);
+        return PendingIntent.getService(ctx, REQUEST_CODE_PENDING_INTENT, intent, PendingIntent.FLAG_IMMUTABLE);
     }
 
-    public static boolean isIgnoringBatteryOptimizations(Context ctx) {
+    private static boolean isIgnoringBatteryOptimizations(Context ctx) {
         final PowerManager pm = ctx.getSystemService(PowerManager.class);
         return pm.isIgnoringBatteryOptimizations(ctx.getPackageName());
     }

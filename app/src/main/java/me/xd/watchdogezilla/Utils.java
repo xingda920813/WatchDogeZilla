@@ -72,7 +72,7 @@ class Utils {
     private static void notifyOnce(Context ctx, String title, String desc, Level level) {
         PeriodicTaskUtils.createNotificationChannel(ctx);
         final Notification.Builder builder = new Notification
-                .Builder(ctx, level == Level.WARNING ? "High" : "Low")
+                .Builder(ctx, level == Level.WARNING ? PeriodicTaskUtils.CHANNEL_ID_HIGH : PeriodicTaskUtils.CHANNEL_ID_LOW)
                 .setContentTitle(title)
                 .setContentText(desc)
                 .setSmallIcon(PeriodicTaskService.icon);
@@ -84,6 +84,7 @@ class Utils {
             final Notification.Action.Builder actionBuilder = new Notification.Action.Builder(PeriodicTaskService.icon, "立即更新", pi);
             builder.addAction(actionBuilder.build());
         }
-        ctx.getSystemService(NotificationManager.class).notify(level == Level.WARNING ? 32 : 16, builder.build());
+        final int notificationId = level == Level.WARNING ? PeriodicTaskUtils.NOTIFICATION_ID_HIGH : PeriodicTaskUtils.NOTIFICATION_ID_LOW;
+        ctx.getSystemService(NotificationManager.class).notify(notificationId, builder.build());
     }
 }

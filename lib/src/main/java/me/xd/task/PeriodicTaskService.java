@@ -33,10 +33,10 @@ public class PeriodicTaskService extends Service {
         if (!sInited || !sStarted) {
             PeriodicTaskUtils.createNotificationChannel(app);
             final Notification.Builder builder = new Notification
-                    .Builder(app, "Low")
+                    .Builder(app, PeriodicTaskUtils.CHANNEL_ID_LOW)
                     .setContentTitle("正在启动服务...")
                     .setSmallIcon(icon != null ? icon : Icon.createWithResource(app, app.getApplicationInfo().icon));
-            startForeground(16, builder.build());
+            startForeground(PeriodicTaskUtils.NOTIFICATION_ID_LOW, builder.build());
             if (!sInited) return START_NOT_STICKY;
         }
         new Thread(() -> {
@@ -80,6 +80,6 @@ public class PeriodicTaskService extends Service {
         final Application app = getApplication();
         final Intent intent = new Intent(app, PeriodicTaskService.class);
         intent.putExtra("fromAlarmManager", true);
-        return PendingIntent.getService(app, 64, intent, PendingIntent.FLAG_IMMUTABLE);
+        return PendingIntent.getService(app, PeriodicTaskUtils.REQUEST_CODE_ALARM_MANAGER, intent, PendingIntent.FLAG_IMMUTABLE);
     }
 }
