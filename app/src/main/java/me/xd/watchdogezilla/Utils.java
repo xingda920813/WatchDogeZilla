@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 import me.xd.task.PeriodicTaskService;
 import me.xd.task.PeriodicTaskUtils;
 
-class Utils {
+public class Utils {
 
-    static double sLastPrice = Double.NaN;
+    public static double lastPrice = Double.NaN;
 
-    static double fetchPrice() {
+    public static double fetchPrice() {
         try {
             return fetchPriceCore();
         } catch (IOException ignored) {}
@@ -47,17 +47,17 @@ class Utils {
         return res.substring(start, end);
     }
 
-    static void notifyOnce(Context ctx, double price) {
+    public static void notifyOnce(Context ctx, double price) {
         final String title = formatPrice(price);
         Level level = Level.INFO;
         final String desc;
-        if (!Double.isNaN(sLastPrice)) {
-            final double changeInPercentage = (price - sLastPrice) / sLastPrice;
+        if (!Double.isNaN(lastPrice)) {
+            final double changeInPercentage = (price - lastPrice) / lastPrice;
             if (changeInPercentage >= 0.008 || changeInPercentage <= -0.008) {
                 level = Level.WARNING;
             }
             final String changeInDesc = (changeInPercentage >= 0 ? "+" : "") + formatPrice(changeInPercentage * 100) + '%';
-            desc = changeInDesc + ", 现报 " + title + ", 前值 " + formatPrice(sLastPrice)
+            desc = changeInDesc + ", 现报 " + title + ", 前值 " + formatPrice(lastPrice)
                     + (level == Level.WARNING ? ". 请注意控制风险." : "");
         } else {
             desc = "ETH/USDT 现报 " + title;
