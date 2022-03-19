@@ -34,14 +34,14 @@ public class PeriodicTaskService extends Service {
             PeriodicTaskUtils.createNotificationChannel(app);
             final Notification.Builder builder = new Notification
                     .Builder(app, PeriodicTaskUtils.CHANNEL_ID_LOW)
-                    .setContentTitle("正在启动服务...")
+                    .setContentTitle(app.getApplicationInfo().loadLabel(app.getPackageManager()))
                     .setSmallIcon(icon != null ? icon : Icon.createWithResource(app, app.getApplicationInfo().icon));
             startForeground(PeriodicTaskUtils.NOTIFICATION_ID_LOW, builder.build());
             if (!sInited) return START_NOT_STICKY;
         }
         new Thread(() -> {
             sTask.run();
-            final boolean fromAlarmManager = intent.getBooleanExtra("fromAlarmManager", false);
+            final boolean fromAlarmManager = intent != null && intent.getBooleanExtra("fromAlarmManager", false);
             long delay = sDelayProvider.applyAsLong(fromAlarmManager);
             if (fromAlarmManager) {
                 if (delay == -1) delay = 15 * 60 * 1000;
