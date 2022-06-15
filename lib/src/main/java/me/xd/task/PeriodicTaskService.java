@@ -8,19 +8,19 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.drawable.Icon;
 import android.os.IBinder;
+import android.text.format.DateUtils;
 
 import java.util.Calendar;
-import java.util.function.ToLongFunction;
 
 public class PeriodicTaskService extends Service {
 
     public static Icon icon;
     private static Runnable sTask;
-    private static ToLongFunction<Boolean> sDelayProvider;
+    private static DelayProvider sDelayProvider;
     private static boolean sInited;
     private static boolean sStarted;
 
-    public static void init(Icon icon, Runnable task, ToLongFunction<Boolean> delayProvider) {
+    public static void init(Icon icon, Runnable task, DelayProvider delayProvider) {
         PeriodicTaskService.icon = icon;
         sTask = task;
         sDelayProvider = delayProvider;
@@ -42,12 +42,16 @@ public class PeriodicTaskService extends Service {
         new Thread(() -> {
             sTask.run();
             final boolean fromAlarmManager = intent != null && intent.getBooleanExtra("fromAlarmManager", false);
-            long delay = sDelayProvider.applyAsLong(fromAlarmManager);
+            long delay = sDelayProvider.getDelay(fromAlarmManager);
             if (fromAlarmManager) {
-                if (delay == -1) delay = 15 * 60 * 1000;
+                if (delay == DelayProvider.EVERY_15_MINUTES) {
+                    delay = 15 * DateUtils.MINUTE_IN_MILLIS;
+                } else if (delay == DelayProvider.DAILY) {
+                    delay = DateUtils.DAY_IN_MILLIS;
+                }
             } else if (!sStarted) {
                 sStarted = true;
-                if (delay == -1) {
+                if (delay == DelayProvider.EVERY_15_MINUTES) {
                     final int minute = Calendar.getInstance().get(Calendar.MINUTE);
                     final int nextMinute;
                     if (minute < 15) {
@@ -59,7 +63,16 @@ public class PeriodicTaskService extends Service {
                     } else {
                         nextMinute = 60;
                     }
-                    delay = (nextMinute - minute) * 60 * 1000;
+                    delay = (nextMinute - minute) * DateUtils.MINUTE_IN_MILLIS;
+                } else if (delay == DelayProvider.DAILY) {
+                    final Calendar cal = Calendar.getInstance();
+                    final long now = cal.getTimeInMillis();
+                    cal.add(Calendar.DATE, 1);
+                    cal.set(Calendar.HOUR_OF_DAY, 0);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 0);
+                    final long next = cal.getTimeInMillis();
+                    delay = next - now;
                 }
             } else {
                 return;

@@ -3,6 +3,7 @@ package me.xd.watchdogezilla;
 import android.app.Application;
 import android.graphics.drawable.Icon;
 
+import me.xd.task.DelayProvider;
 import me.xd.task.PeriodicTaskService;
 
 public class App extends Application {
@@ -14,6 +15,6 @@ public class App extends Application {
             final double price = Utils.fetchPrice();
             Utils.notifyOnce(this, price);
             Utils.lastPrice = price;
-        }, fromAlarmManager -> -1);
+        }, fromAlarmManager -> DelayProvider.EVERY_15_MINUTES);
     }
 }
